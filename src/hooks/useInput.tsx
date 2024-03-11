@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
-import { checkValueByOnlyLetters } from "../helpers/helpers";
 
 type UseInputProp = {
   cb?: (value: any) => void;
+  rules?: Function[];
 };
 
-export const useInput = ({ cb }: UseInputProp) => {
+export const useInput = ({ cb, rules }: UseInputProp) => {
   const [value, setValue] = useState<string>("");
   const [error, setError] = useState<boolean>(false);
 
@@ -16,11 +16,20 @@ export const useInput = ({ cb }: UseInputProp) => {
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setValue(event.target.value);
 
-    if (checkValueByOnlyLetters(event.target.value)) {
-      setError(true);
-    } else {
-      setError(false);
+    if (rules) {
+      for (const func of rules) {
+        if (func(event.target.value)) {
+          setError(true);
+          break;
+        } else setError(false);
+      }
     }
+
+    // if (checkValueByOnlyLetters(event.target.value)) {
+    //   setError(true);
+    // } else {
+    //   setError(false);
+    // }
 
     cb && cb({ query: event.target.value });
   };

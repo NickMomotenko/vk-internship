@@ -11,6 +11,7 @@ import {
 import { useState } from "react";
 import { useDebounce } from "../../hooks/useDebounce";
 import { useInput } from "../../hooks/useInput";
+import { checkValueByOnlyLetters } from "../../helpers/helpers";
 
 type Task2Props = {
   setActivePanel: (value: string) => void;
@@ -22,6 +23,8 @@ export const Task2: React.FC<Task2Props> = ({ setActivePanel, id }) => {
     [key: string]: number;
   }>({});
 
+  const [currentUser, setCurrentUser] = useState({});
+
   const { value, error, handleChange } = useInput({
     cb: ({ query }) => {
       debouncedCallback({
@@ -29,6 +32,7 @@ export const Task2: React.FC<Task2Props> = ({ setActivePanel, id }) => {
         query: query,
       });
     },
+    rules: [checkValueByOnlyLetters],
   });
 
   const getData = async ({ url, query }: { url: string; query: string }) => {
@@ -42,6 +46,8 @@ export const Task2: React.FC<Task2Props> = ({ setActivePanel, id }) => {
       setUsersData((prevState) => {
         return { ...prevState, [name]: age };
       });
+
+      setCurrentUser({ [name]: age });
     }
   };
 
@@ -55,7 +61,7 @@ export const Task2: React.FC<Task2Props> = ({ setActivePanel, id }) => {
 
   return (
     <Panel id={id}>
-      <PanelHeader style={{ marginBottom: 0 }}>Panel 2</PanelHeader>
+      <PanelHeader style={{ marginBottom: 0 }}>Задание #2</PanelHeader>
       <Group>
         <FormItem htmlFor="example" top="Введите что нибудь">
           <Input
@@ -66,6 +72,7 @@ export const Task2: React.FC<Task2Props> = ({ setActivePanel, id }) => {
             onChange={handleChange}
           />
         </FormItem>
+        {/* {currentUser && <Text>{currentUser}</Text>} */}
         {error && <Text>Введены не только буквы</Text>}
         <Button onClick={handleSumbit} style={{ margin: 16 }}>
           Sumbit

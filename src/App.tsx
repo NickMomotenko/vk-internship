@@ -5,7 +5,7 @@ import { Task1 } from "./containers/Task1";
 import { Task2 } from "./containers/Task2";
 
 export const App = () => {
-  const [activePanel, setActivePanel] = useState<string>("panel1");
+  const [activePanel, setActivePanel] = useState<string>("panel2");
 
   return (
     <View activePanel={activePanel}>

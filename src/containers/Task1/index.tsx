@@ -50,7 +50,7 @@ export const Task1: React.FC<Task1Props> = ({ setActivePanel, id }) => {
 
   return (
     <Panel id={id}>
-      <PanelHeader style={{ marginBottom: 0 }}>Panel 1</PanelHeader>
+      <PanelHeader style={{ marginBottom: 0 }}>Задание #1</PanelHeader>
       <Group>
         <FormItem htmlFor="example" top="Введите что нибудь">
           <Input
