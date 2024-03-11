@@ -12,7 +12,7 @@ import {
   Text,
 } from "@vkontakte/vkui";
 
-import { useData } from "../../api/hooks/useData";
+import { useData } from "../../hooks/useData";
 
 type Task1Props = {
   setActivePanel: (value: string) => void;
