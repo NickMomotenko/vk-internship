@@ -3,7 +3,7 @@ export const checkValueByOnlyLetters = (value: string) => {
 
   if (!regex.test(value)) {
     return true;
-  }
+  } else false;
 };
 
 export const countNonLetterAtEnd = (word: string) => {

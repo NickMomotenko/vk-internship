@@ -1,35 +1,36 @@
 import { useEffect, useState } from "react";
+import { checkValueByOnlyLetters } from "../helpers/helpers";
 
 type UseInputProp = {
   cb?: (value: any) => void;
-  rules?: Function[];
+  // rules?: Function[];
 };
 
-export const useInput = ({ cb, rules }: UseInputProp) => {
+export const useInput = ({ cb }: UseInputProp) => {
   const [value, setValue] = useState<string>("");
   const [error, setError] = useState<boolean>(false);
 
   useEffect(() => {
-    if (!value.length) setError(false);
+    if (value.length === 0) setError(false);
   }, [value]);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setValue(event.target.value);
 
-    if (rules) {
-      for (const func of rules) {
-        if (func(event.target.value)) {
-          setError(true);
-          break;
-        } else {
-          setError(false);
-          continue;
-        }
-      }
-    }
+    if (checkValueByOnlyLetters(event.target.value)) {
+      setError(() => {
+        cb && cb({ query: event.target.value, error: true });
 
-    cb && cb({ query: event.target.value });
+        return true;
+      });
+    } else {
+      setError(() => {
+        cb && cb({ query: event.target.value, error: false });
+
+        return false;
+      });
+    }
   };
 
-  return { value, error, handleChange };
+  return { value, error, handleChange, setError };
 };

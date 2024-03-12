@@ -8,10 +8,9 @@ import {
   PanelHeader,
   Text,
 } from "@vkontakte/vkui";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useDebounce } from "../../hooks/useDebounce";
 import { useInput } from "../../hooks/useInput";
-import { checkValueByOnlyLetters } from "../../helpers/helpers";
 
 type Task2Props = {
   setActivePanel: (value: string) => void;
@@ -19,42 +18,71 @@ type Task2Props = {
 };
 
 export const Task2: React.FC<Task2Props> = ({ setActivePanel, id }) => {
-  const [usersData, setUsersData] = useState<{
-    [key: string]: number;
-  }>({});
+  const [requests, setRequests] = useState<string[]>([]);
 
   const [currentUser, setCurrentUser] = useState({});
 
   const { value, error, handleChange } = useInput({
-    cb: ({ query }) => {
+    cb: ({ query, error }) => {
       debouncedCallback({
         url: "https://api.agify.io",
         query: query,
+        error: error,
       });
     },
-    rules: [checkValueByOnlyLetters],
   });
 
-  const getData = async ({ url, query }: { url: string; query: string }) => {
-    if ((query && usersData[query]) || query.length === 0) return;
+  const errorTextRef = useRef<HTMLDivElement>(null);
 
-    let res = await fetch(`${url}?name=${query}`);
+  const getData = async ({
+    url,
+    query,
+    error,
+  }: {
+    url: string;
+    query: string;
+    error: boolean;
+  }) => {
+    if (error || !query) return;
 
-    let { name, age } = await res.json();
+    if (query) {
+      if (!requests.includes(query)) {
+        if (errorTextRef.current) errorTextRef.current.innerText = "";
 
-    if (age && name) {
-      setUsersData((prevState) => {
-        return { ...prevState, [name]: age };
-      });
+        setRequests((prevState: any) => [...prevState, query]);
+      } else {
+        if (errorTextRef.current) {
+          errorTextRef.current.innerText =
+            "Такой запрос уже был, введи что-то другое";
+        }
 
-      setCurrentUser({ [name]: age });
+        return;
+      }
+    }
+
+    try {
+      let res = await fetch(`${url}?name=${query}`);
+
+      if (!res.ok) {
+        throw new Error(res.statusText);
+      }
+
+      let { name, age } = await res.json();
+
+      if (age && name) {
+        setCurrentUser({ [name]: age });
+      }
+    } catch (err) {
+      if (errorTextRef.current) {
+        errorTextRef.current.innerText = "Ошибка сервера";
+      }
     }
   };
 
   const handleSumbit = () => {
     stopTimer();
 
-    getData({ url: "https://api.agify.io", query: value });
+    getData({ url: "https://api.agify.io", query: value, error: error });
   };
 
   const renderCurrentUser = () => {
@@ -64,8 +92,8 @@ export const Task2: React.FC<Task2Props> = ({ setActivePanel, id }) => {
 
     if (name && age) {
       return (
-        <Text>
-          {name && name} {age && age}
+        <Text style={{ margin: 16 }}>
+          Последний результат: {name && name} {age && age}
         </Text>
       );
     }
@@ -87,7 +115,10 @@ export const Task2: React.FC<Task2Props> = ({ setActivePanel, id }) => {
           />
         </FormItem>
         {currentUser && renderCurrentUser()}
-        {error && <Text>Введены не только буквы</Text>}
+        {error && (
+          <Text style={{ margin: 16 }}>Не используй русские буквы и цифры</Text>
+        )}
+        <Text getRootRef={errorTextRef} style={{ margin: 16 }}></Text>
         <Button onClick={handleSumbit} style={{ margin: 16 }}>
           Sumbit
         </Button>
