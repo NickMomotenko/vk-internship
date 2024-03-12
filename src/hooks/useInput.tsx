@@ -21,15 +21,12 @@ export const useInput = ({ cb, rules }: UseInputProp) => {
         if (func(event.target.value)) {
           setError(true);
           break;
-        } else setError(false);
+        } else {
+          setError(false);
+          continue;
+        }
       }
     }
-
-    // if (checkValueByOnlyLetters(event.target.value)) {
-    //   setError(true);
-    // } else {
-    //   setError(false);
-    // }
 
     cb && cb({ query: event.target.value });
   };

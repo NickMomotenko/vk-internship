@@ -8,7 +8,7 @@ import {
   PanelHeader,
   Text,
 } from "@vkontakte/vkui";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useDebounce } from "../../hooks/useDebounce";
 import { useInput } from "../../hooks/useInput";
 import { checkValueByOnlyLetters } from "../../helpers/helpers";
@@ -42,7 +42,7 @@ export const Task2: React.FC<Task2Props> = ({ setActivePanel, id }) => {
 
     let { name, age } = await res.json();
 
-    if (age) {
+    if (age && name) {
       setUsersData((prevState) => {
         return { ...prevState, [name]: age };
       });
@@ -55,6 +55,20 @@ export const Task2: React.FC<Task2Props> = ({ setActivePanel, id }) => {
     stopTimer();
 
     getData({ url: "https://api.agify.io", query: value });
+  };
+
+  const renderCurrentUser = () => {
+    if (!Object.entries(currentUser).length) return;
+
+    let [name, age]: [string, number | any] = Object.entries(currentUser)[0];
+
+    if (name && age) {
+      return (
+        <Text>
+          {name && name} {age && age}
+        </Text>
+      );
+    }
   };
 
   const { debouncedCallback, stopTimer } = useDebounce(getData, 3000);
@@ -72,7 +86,7 @@ export const Task2: React.FC<Task2Props> = ({ setActivePanel, id }) => {
             onChange={handleChange}
           />
         </FormItem>
-        {/* {currentUser && <Text>{currentUser}</Text>} */}
+        {currentUser && renderCurrentUser()}
         {error && <Text>Введены не только буквы</Text>}
         <Button onClick={handleSumbit} style={{ margin: 16 }}>
           Sumbit
