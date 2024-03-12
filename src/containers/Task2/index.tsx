@@ -8,7 +8,7 @@ import {
   PanelHeader,
   Text,
 } from "@vkontakte/vkui";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useDebounce } from "../../hooks/useDebounce";
 import { useInput } from "../../hooks/useInput";
 import { checkValueByOnlyLetters } from "../../helpers/helpers";

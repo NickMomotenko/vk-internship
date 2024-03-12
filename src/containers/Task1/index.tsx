@@ -13,6 +13,7 @@ import {
 } from "@vkontakte/vkui";
 
 import { useData } from "../../hooks/useData";
+import { countNonLetterAtEnd } from "../../helpers/helpers";
 
 type Task1Props = {
   setActivePanel: (value: string) => void;
@@ -34,15 +35,18 @@ export const Task1: React.FC<Task1Props> = ({ setActivePanel, id }) => {
 
   const setCursorPlaceByText = (text: string) => {
     if (textInputRef && textInputRef.current) {
-      let firstWordLength = text?.split(" ")[0].length;
+      let word = text?.trim().split(" ")[0];
+
+      let offsetСounter: number | undefined = countNonLetterAtEnd(word);
+
+      let finalLength = !offsetСounter
+        ? word.length
+        : word.length - offsetСounter;
 
       textInputRef.current.value = text;
 
       setTimeout(() => {
-        textInputRef.current?.setSelectionRange(
-          firstWordLength,
-          firstWordLength
-        );
+        textInputRef.current?.setSelectionRange(finalLength, finalLength);
         textInputRef.current?.focus();
       }, 0);
     }
